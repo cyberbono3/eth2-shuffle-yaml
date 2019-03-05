@@ -1,4 +1,4 @@
-# eth2-shuffle
+# Little Enhancement of eth2-shuffle to shuffle indexs 
 
 Shuffling algorithm for ETH 2.0.
 
