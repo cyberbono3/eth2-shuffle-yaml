@@ -45,15 +45,19 @@ def get_permuted_index(index: int, list_size: int, seed: bytes) -> int:
 
     return index
 
+   
+
+# runs new shuffling algorithm
 def shuffle_indexes(idxs, seed):
     list_size = len(idxs)
     shuffling = [0 for _ in range(list_size)]
     for i in range(list_size):
         shuffling[get_permuted_index(i, list_size, seed)] = i
-    end_list = [idxs[x] for x in shuffling]
-    return end_list
+    return [idxs[x] for x in shuffling]
+  
 
-def gen_test_outputs(yaml_path = "/home/ai/Downloads/shuffle.yaml"):
+# gen_test_outputs reads shuffle.yaml locally file then writes the outputs of new_shuffle_algorithm to it.
+def gen_test_outputs(yaml_path = "/home/ai/shuffle.yaml"):
     with open(yaml_path, 'r') as f:
         shuffle = yaml.load(f.read())
     for idx, test in enumerate(shuffle['test_cases']):
@@ -62,22 +66,3 @@ def gen_test_outputs(yaml_path = "/home/ai/Downloads/shuffle.yaml"):
     with open(yaml_path, 'w') as f:
         yaml.dump(shuffle, f)
 
-
-with open('tests.csv', mode='w') as employee_file:
-    tests_writer = csv.writer(employee_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-
-    for seed in [hash(int_to_bytes4(seed_init_value)) for seed_init_value in range(30)]:
-        for list_size in [0, 1, 2, 3, 5, 10, 100, 1000]:
-            start_list = [i for i in range(list_size)]
-            # random input, using python shuffle. Seed is static here, we just want consistent test generation.
-            # Checking the shuffling on a simple incremental list is not good enough.
-            # I.e. we want the shuffle to be independent of the contents of the list.
-            random.seed(123)
-            random.shuffle(start_list)
-            encoded_start = ":".join([str(x) for x in start_list])
-            shuffling = [0 for _ in range(list_size)]
-            for i in range(list_size):
-                shuffling[get_permuted_index(i, list_size, seed)] = i
-            end_list = [start_list[x] for x in shuffling]
-            encoded_shuffled = ":".join([str(v) for v in end_list])
-            tests_writer.writerow([binascii.hexlify(seed).decode("utf-8"), list_size, encoded_start, encoded_shuffled])
